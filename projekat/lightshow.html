@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino LED Control</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #0a0a0a;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .led-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .led {
+            width: 30px;
+            height: 30px;
+            margin: 0 10px;
+            border-radius: 50%;
+            background-color: #666;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .controls label {
+            margin-bottom: 10px;
+        }
+        select, button, input[type="number"] {
+            margin: 5px;
+            padding: 8px;
+            font-size: 16px;
+            border: none;
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="led-container">
+        <div class="led red" id="rgb_red"></div>
+        <div class="led green" id="green"></div>
+        <div class="led yellow" id="yellow"></div>
+    </div>
+
+    <div class="controls">
+        <div>
+            <label for="mode">Mode:</label>
+            <select id="mode">
+                <option value="0">Blink Mode</option>
+                <option value="1">Fade Mode</option>
+                <option value="2">Chase Mode</option>
+                <option value="4">Breathing Mode</option>
+                <option value="3">Random Mode</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="direction">Direction:</label>
+            <select id="direction">
+                <option value="0">Forwards</option>
+                <option value="1">Backwards</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="duration">Duration (ms):</label>
+            <input type="number" id="duration" min="100" max="2000" step="100" value="500">
+        </div>
+
+        <button onclick="applySettings()">Apply</button>
+    </div>
+
+    <script>
+        function applySettings() {
+            const mode = document.getElementById('mode').value;
+            const direction = document.getElementById('direction').value;
+            const duration = document.getElementById('duration').value;
+            console.log(mode);
+            console.log(direction);
+            console.log(duration);
+            fetch('http://localhost:3000/change', {
+                method: 'POST',
+                headers: {
+		            'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ mode, direction, duration }),
+            })
+            .then(response => {
+                console.log(response);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+        }
+    </script>
+</body>
+</html>
